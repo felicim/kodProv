@@ -1,0 +1,148 @@
+html {
+    height:100%;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: linear-gradient(#2f3142, #67687d);
+    margin:0;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+#wrapper {
+    width:80%;
+    margin: 30px auto;
+    max-width: 600px;
+    min-width: 360px;
+}
+
+.hidden {
+    display: none;
+}
+
+#heading {
+    color: #fff;
+}
+
+#contactContainer {
+    color: #fff;
+    width: 100%;
+  }
+
+/*contactList*/
+
+#contactList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+#contactList li {
+    background-color: #4e536f;
+    margin-bottom: 2px;
+    padding-left: 10px;
+    line-height: 50px;
+    font-weight: bold;
+}
+
+#contactList :first-child {
+    border-radius: 10px 10px 0 0;
+}
+
+#contactList :last-child {
+    border-radius: 0 0 10px 10px;
+}
+
+#contactList li:only-child {
+    border-radius: 10px;
+}
+
+#contactList li:hover {
+    background-color: #3f435b;
+}
+
+/*contactDetails*/
+
+#contactDetails {
+  width:90%;
+  max-width:600px;
+  height:100%;
+  top:150px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  border-radius: 5px;
+  position:fixed;
+  background-color: #b7c0ce;
+}
+
+#contactDetailName {
+    padding-left: 10px;
+    float: left;
+}
+
+#contactDetailEmail{
+    width: 100%;
+    float:left;
+    padding-left: 10px;
+    margin: 0;
+}
+
+#close {
+    float: right;
+    margin: 10px;
+  }
+
+#fave {
+    margin: 22px 0 0 5px;  
+}
+
+/*Search*/
+
+#searchContainer {
+    margin-bottom: 30px;
+    position:relative;
+} 
+
+#searchInput {
+    background-color: #4e536f;
+    border:0;
+    border-radius: 4px;
+    height: 40px;
+    font-size: 1.2em;
+    color: #fff;
+    width:100%;
+}
+
+#searchInput::placeholder {
+    color: #aaaaaa;
+    padding-left:10px;
+}
+
+#searchIcon {
+    width:24px;
+    padding: 10px 10px 0 0;
+    position: absolute;
+    right:5px;
+}
+
+/*Filter*/
+
+#filterContainer {
+    height:20px;
+}
+
+#contactFilter, #contactFilter :visited {
+    float: right;
+    color: #fff;
+    text-decoration: none;
+}
+#contactFilter:hover {
+    color:#aaaaaa;
+}
+
+
+
+

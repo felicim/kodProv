@@ -1,123 +1,184 @@
-contacts = [
-  {
-    "name": "Roselyn Hahn",
-    "email": "roselyn.hahn@example.com"
-  },
-  {
-    "name": "Javon Gleichner",
-    "email": "javon.gleichner@example.com"
-  },
-  {
-    "name": "Madonna Metz",
-    "email": "madonna.metz@example.com"
-  },
-  {
-    "name": "Jeffrey Ryan",
-    "email": "jeffrey.ryan@example.com"
-  },
-  {
-    "name": "Nat Stiedemann",
-    "email": "nat.stiedemann@example.com"
-  },
-  {
-    "name": "Nicklaus Stokes",
-    "email": "nicklaus.stokes@example.com"
-  },
-  {
-    "name": "Morris Bechtelar",
-    "email": "morris.bechtelar@example.com"
-  },
-  {
-    "name": "Michale Hammes",
-    "email": "michale.hammes@example.com"
-  },
-  {
-    "name": "Keyon Herzog",
-    "email": "keyon.herzog@example.com"
-  },
-  {
-    "name": "Brody Schaefer",
-    "email": "brody.schaefer@example.com"
-  },
-  {
-    "name": "Stacey Kozey",
-    "email": "stacey.kozey@example.com"
+(function () {
+
+  var faveContacts = [];
+  var isFiltering = false;
+
+  window.onload = () => {
+    fetchData();
   }
-];
 
-window.onload = function () {
-  function render() {
-    document.getElementById("contact-list").innerHTML = "";
+  const fetchData = () => {
+    fetch('contacts.json')
+    .then(res => res.json())
+    .catch(error => handleError(error))
+    .then(data => {
+      renderContacts(data);
+      renderFilter(data);
+      renderSearch(data);
+    });
+  }
+  
+  const renderContacts = (contacts) => {     
+    let contactContainer = getDOMElement('contactContainer');
+    let contactList = createElement('ul');
 
-    for (var i = 0; i < contacts.length; i++) {
-      var el = document.createElement("div");
-      el.innerHTML = contacts[i].name;
-      el.className = 'contactName';
-      el.id = i;
-      el.onclick = e => {
-        var contactId = parseInt(e.currentTarget.id);
-        var contactDetails = document.getElementById('contactDetails');
-        var favouriteClass = contacts[parseInt(e.currentTarget.id)].favourite ? "favourite" : "";
-        contactDetails.innerHTML =
-          "<span id='close-details'>x</span>" +
-          "<span id='favourite' class='" + favouriteClass + "'>*</span>" +
-          "<div>" + contacts[parseInt(e.currentTarget.id)].name + "</div>" +
-          "<div>" + contacts[parseInt(e.currentTarget.id)].email + "</div>";
-        contactDetails.setAttribute("class", "");
+    contactContainer.innerHTML = '';
 
-        document.getElementById('favourite').onclick = function (e) {
-          contacts[contactId].favourite = !contacts[contactId].favourite;
-
-          if (e.currentTarget.getAttribute("class") == "favourite") {
-            e.currentTarget.setAttribute("class", "");
-          } else {
-            e.currentTarget.setAttribute("class", "favourite");
-          }
-        }
-
-        document.getElementById('close-details').onclick = function () {
-          contactDetails.innerHTML = "";
-          contactDetails.setAttribute("class", "hidden");
-        }
-
-      };
-
-      document.getElementById("contact-list").appendChild(el);
+    contactList.id = 'contactList';
+    contactContainer.appendChild(contactList);
+    
+    if (contacts.length == 0) {        
+      handleError('No contacts found');
+    } else {
+      contacts.forEach(contact => { 
+        let contactListEntry = createElement('li');
+        contactListEntry.innerText = contact.name;
+        contactListEntry.id = contact.id;
+        contactListEntry.addEventListener('click', handleClickOnContact(contact));
+        contactList.appendChild(contactListEntry);
+      });
     }
+  }
 
-    document.getElementById('contactFilter').onclick = function (e) {
-      var contactNames = document.querySelectorAll('.contactName');
+    const renderFilter = (contacts) => {  
+    let filterContainer = getDOMElement('filterContainer');
+    let filter = createElement('a'); 
 
-      if (e.currentTarget.innerText === "Visa alla") {
-        e.currentTarget.innerText = "Filtrera favoriter"
-        contactNames.forEach(function (node, i) {
-          node.setAttribute("class", "contactName");
-        })
+    filter.innerText = 'Filter favourites';
+    filter.id = "contactFilter";
+    filter.href = '#'; 
+    filter.addEventListener('click', handleClickOnFilter(contacts));
+    filterContainer.appendChild(filter);
+  }
+  
+  const renderSearch = (contacts) => {
+    let searchContainer = getDOMElement('searchContainer');
+    let searchInput = createElement('input');
+    let searchIcon = createSvgIcon('/assets/magnifier.svg', 'image/svg+xml', 'searchIcon')
+
+    searchInput.setAttribute('type', 'text');
+    searchInput.id = ('searchInput')
+    searchInput.placeholder = 'Search';
+    searchInput.addEventListener('input', handleSearchInput(contacts));
+    searchContainer.appendChild(searchInput);
+  
+    searchContainer.appendChild(searchIcon);
+  }
+
+  const renderContactDetails = (contact) => {
+    let contactDetails = getDOMElement('contactDetails');
+    let faveSrc = contact.favourite ? '/assets/star.svg' : '/assets/star_border.svg';
+    let faveIcon = createSvgIcon(faveSrc, 'image/svg+xml', 'fave');
+    let closeIcon = createSvgIcon('/assets/close.svg', 'image/svg+xml', 'close');
+    let contactName = createElement('h2');
+    let contactEmail = createElement('p');
+
+    contactDetails.innerHTML = '';
+    contactDetails.classList.remove('hidden'); 
+  
+    closeIcon.addEventListener('click', handleClickOnCloseIcon('contactDetails')); 
+    contactDetails.appendChild(closeIcon);
+  
+    contactName.innerText = contact.name;
+    contactName.id = 'contactDetailName';
+    contactDetails.appendChild(contactName);
+  
+    faveIcon.addEventListener('click', handleClickOnFaveIcon(contact));
+    contactDetails.appendChild(faveIcon);
+  
+    contactEmail.innerText = contact.email;
+    contactEmail.id = 'contactDetailEmail';
+    contactDetails.appendChild(contactEmail);
+  }
+
+  const getDOMElement = (id) => {
+    return document.getElementById(id);
+  }
+
+  const createElement = (element) => {
+    return document.createElement(element);
+  }
+  
+  const createSvgIcon = (src, type, id) => {  
+    let svg = createElement('img');
+
+    svg.setAttribute('src', src);
+    svg.setAttribute('type', type);
+    svg.id = id;
+    return svg;
+  }
+  
+  const filterFavourites = () => {
+    renderContacts(faveContacts);
+  }
+  
+  const handleError = (msg) => {
+    let contactContainer = getDOMElement('contactContainer');
+    let errorMessage = createElement('p');
+
+    errorMessage.innerText = msg;
+    contactContainer.appendChild(errorMessage);
+  }
+  
+  const handleClickOnContact = (contact) => {
+    return function() { 
+      renderContactDetails(contact);
+    }
+  }
+  
+  const handleClickOnCloseIcon = (elementId) => {
+    return function() {
+      getDOMElement(elementId).classList.toggle('hidden'); 
+    } 
+  }
+  
+  const handleClickOnFaveIcon = (contact) => {
+    return function () {
+      let faveIcon = getDOMElement('fave');
+      
+      contact.favourite = !contact.favourite;
+
+      if(contact.favourite) {
+        faveIcon.setAttribute('src', '/assets/star.svg')
+        faveContacts.push(contact);
       } else {
-        e.currentTarget.innerText = "Visa alla";
-        contactNames.forEach(function (node, i) {
-          if (contacts[i].favourite) {
-            node.setAttribute("class", "contactName");
-          } else {
-            node.setAttribute("class", "hidden contactName");
-          }
-        })
+        faveIcon.setAttribute('src', '/assets/star_border.svg');
+        faveContacts.splice(faveContacts.indexOf(contact), 1);      
       }
-    };
-
-    document.getElementById('search-button').onclick = function () {
-      var contactNames = document.querySelectorAll('.contactName');
-      contactNames.forEach(function (node) {
-        var regexp = new RegExp(document.getElementById('search').value.toLowerCase());
-        if (regexp.test(node.innerText.toLowerCase())) {
-          node.setAttribute("class", "contactName");
-        } else {
-          node.setAttribute("class", "hidden contactName");
-        }
-      })
-
+  
+      if (isFiltering == true) {
+        filterFavourites()
+      }
     }
   }
 
-  render();
-};
+  const handleClickOnFilter = (contacts) => {
+    return function () {
+      let contactFilter = getDOMElement('contactFilter');
+      
+      if (contactFilter.innerText == 'Show all') {
+        contactFilter.innerText = 'Filter favourites'
+        isFiltering = false;
+        renderContacts(contacts);
+      } else {
+        contactFilter.innerText = 'Show all';
+        isFiltering = true;
+        filterFavourites();
+      }
+    }
+  }
+  
+  const handleSearchInput = (contacts) => {
+    return function() {
+      let contactFilter = getDOMElement('contactFilter');
+      let input = getDOMElement('searchInput').value.toLowerCase();
+      let matchedContacts = contacts.filter(contact => contact.name.toLowerCase().search(input) >= 0);
+        
+      if (isFiltering == true) {
+        contactFilter.innerText = 'Filter favourites';
+      }
+      renderContacts(matchedContacts);
+    }
+  }
+}());
+
